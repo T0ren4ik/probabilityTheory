@@ -8,37 +8,41 @@ class BaseEnumerator
       @src = src.dup
     end
     @src.sort!
-    @start_idxs = (0...src.size).to_a
-    @curr_idxs = @start_idxs.dup
-  end
-
-  def take n=1
-    ret, = get_n(@start_idxs, n)
-    ret
+    @curr_idxs = @start_idxs = nil
+    @end_not_reached = true
   end
 
   def next
-    if @curr_idxs 
-      ret, @curr_idxs = get_n(@curr_idxs, 1)
-    else
-      ret = nil
-    end
+    ret = get_current
+    index_forward if ret
+    ret
+  end
+
+  def restart
+    @curr_idxs.fill {|i| @start_idxs[i]}
+    @end_not_reached = true
+  end
+
+  def take n=1
+    restart
+    ret = []
+    (1..n).each { ret << self.next }
     ret
   end
 
   def to_a
-    @curr_idxs = @start_idxs.dup
+    restart
     ret = []
-    loop do 
-      next_el = self.next
-      break if !next_el
-      ret << next_el
+    loop do
+      next_item = self.next
+      break if !next_item
+      ret << next_item
     end
     ret
   end
 
   def count
-    @curr_idxs = @start_idxs.dup
+    restart
     ret = 0
     if block_given?
       loop do 
@@ -46,10 +50,7 @@ class BaseEnumerator
         break if !next_el
         ret += 1 if yield next_el
       end
-    else 
-      if @total_count
-        return @total_count
-      end
+    else
       loop do 
         next_el = self.next
         break if !next_el
@@ -59,56 +60,63 @@ class BaseEnumerator
     ret
   end
 
-  def map
+  def map &block
+    Map.new self, &block
   end
 
-  def filter
+  def filter &block
+    Filter.new self, &block
   end
 
   private
 
-  def get_by_idxs idxs
-    idxs.map {|i| @src[i]}
+  def get_current
+    @end_not_reached ? @curr_idxs.map {|i| @src[i]} : nil
   end
 
-  def get_n idxs, n
-    ret = []
-    n.times do
-      ret << get_by_idxs(idxs)
-      idxs = self.class.index_arr_forward(idxs)
-    end
-    ret = ret[0] if n == 1
-    [ret, idxs]
+  def index_forward
+    # Should set @end_not_reached to false if unable to move forward
+    raise NotImplementedError
   end
 
-  # CLASS METHODS
-
-  class << self
-    def index_arr_forward index_arr
-      raise NotImplementedError
-    end
-  end
 end
 
-# class Map < BaseEnumerator
+class HigherOrderEnumerator < BaseEnumerator
+  
+  def initialize src_enum, &block
+    raise ArgumentError('Implemented only for BaseEnumerator objects') unless src_enum.is_a? BaseEnumerator 
+    @block = block
+    @src_enum = src_enum
+  end
 
-#   def initialize src, &block
-#     raise ArgumentError('Implemented for two types only: BaseEnumerator and Array') unless (src.is_a? Array) || (src.is_a? BaseEnumerator) 
-#     @src = src
-#     @block = block
-#   end
+  def restart
+    @src_enum.restart
+  end
 
-#   def next
-#     @block.call @src.next
-#   end
+  def next
+    raise NotImplementedError
+  end
 
-# end
+end
 
-# class Filter < BaseEnumerator
+class Map < HigherOrderEnumerator
 
-#   def initialize src, &block
-#     @src = src
-#     @block = block
-#   end
+  def next
+    arg = @src_enum.next
+    arg ? @block.call(arg) : nil
+  end
 
-# end
+end
+
+class Filter < HigherOrderEnumerator
+
+  def next
+    arg = nil
+    loop do
+      arg = @src_enum.next
+      break if !arg || (@block.call(arg))
+    end
+    arg
+  end
+
+end

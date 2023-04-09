@@ -36,7 +36,7 @@ module Combinatorics
   end
 
   def placements(n, k)
-    permutations_with_replace(n, n - k)
+    permutations(n, n - k)
   end
 
   def placements_with_replace(n, k)
@@ -44,7 +44,7 @@ module Combinatorics
   end
 
   def combinations(n, k)
-    permutations_with_replace(n, n - k, k)
+    permutations(n, n - k, k)
   end
 
   def combinations_with_replace(n, k)
@@ -55,27 +55,26 @@ module Combinatorics
   
     def initialize src
       super src
-      # this needed to handle permutations with replace
-      @start_idxs = @start_idxs.map {|i| @src.index(@src[i])}
+      # the strange assignment needed to handle permutations with replace
+      @start_idxs = (0...src.size).map {|i| @src.index(@src[i])}
+      @curr_idxs = @start_idxs.dup
       # @total_count = permutations(@src.size)
     end
   
     # CLASS METHODS
-  
-    class << self
-      def index_arr_forward index_arr
-        # Narayana algorithm
-        index_arr = index_arr.dup
-        idxs = (0...index_arr.size).to_a.reverse
-        j = idxs[1..-1].find {|idx| index_arr[idx] < index_arr[idx + 1]}
-        if j
-          l = idxs.find {|idx| index_arr[idx] > index_arr[j]}
-          index_arr[j], index_arr[l] = index_arr[l], index_arr[j]
-          index_arr[0..j] + index_arr[j+1..-1].reverse
-        else
-          # TODO
-          nil
-        end
+
+    private
+    
+    def index_forward
+      # Narayana algorithm
+      idxs = (0...@curr_idxs.size).to_a.reverse
+      j = idxs[1..-1].find {|idx| @curr_idxs[idx] < @curr_idxs[idx + 1]}
+      if j
+        l = idxs.find {|idx| @curr_idxs[idx] > @curr_idxs[j]}
+        @curr_idxs[j], @curr_idxs[l] = @curr_idxs[l], @curr_idxs[j]
+        @curr_idxs[j+1..-1] = @curr_idxs[j+1..-1].reverse
+      else
+        @end_not_reached = false
       end
     end
   
@@ -85,16 +84,19 @@ module Combinatorics
     
     def initialize src, k
       BaseEnumerator.instance_method(:initialize).bind(self).call(src)
-      raise NotImplementedError, "Currently class Placements does not support repetitions in the source iterable" if @src.uniq.size < @start_idxs.size
+      raise NotImplementedError, "Currently class Placements does not support repetitions in the source iterable" if @src.uniq.size < @src.size
       @k = k
-      @start_idxs.map! {|i| i >= @k ? @k : i}
+      @start_idxs = (0...src.size).map {|i| i >= @k ? @k : i}
+      @curr_idxs = @start_idxs.dup
     end
   
     private
   
-    def get_by_idxs idxs
-      shrinked = @src.zip(idxs).filter {|el, i| i < @k}
-      idxs.select {|i| i < @k}.map {|idx| shrinked[idx].first}
+    def get_current
+      if @end_not_reached
+        shrinked = @src.zip(@curr_idxs).filter {|el, i| i < @k}
+        return @curr_idxs.select {|i| i < @k}.map {|idx| shrinked[idx].first}
+      end
     end
   
   end
@@ -103,25 +105,38 @@ module Combinatorics
     
     def initialize src, k
       BaseEnumerator.instance_method(:initialize).bind(self).call(src)
-      raise NotImplementedError, "Currently class Combinations does not support repetitions in the source iterable" if @src.uniq.size < @start_idxs.size
+      raise NotImplementedError, "Currently class Combinations does not support repetitions in the source iterable" if @src.uniq.size < @src.size
       @k = k
-      @start_idxs.map! {|i| i >= @k ? 1 : 0}
-      puts @start_idxs.inspect
+      @start_idxs = (0...src.size).map {|i| i >= @k ? 1 : 0}
+      @curr_idxs = @start_idxs.dup
     end
   
     private
   
-    def get_by_idxs idxs
-      @src.zip(idxs).filter {|el, i| i == 0}.map {|p| p.first}
+    def get_current
+      @src.zip(@curr_idxs).filter {|el, i| i == 0}.map {|p| p.first} if @end_not_reached
     end
   
   end
 
 end
 
+# include Combinatorics
+
 # def local_test
-#   obj = Combinations.new '12345', 2
+#   # obj = Combinations.new '12345', 2
+#   # puts obj.to_a.inspect
+
+#   obj = Placements.new '1234', 2
+#   # 30.times do
+#   #   v = obj.next
+#   #   puts v.inspect if v
+#   #   puts 'Hi There' if !v
+#   # end
+#   # puts obj.count
+#   puts obj.count {|arr| arr[0] == '1'}
 #   puts obj.to_a.inspect
+
 # end
 
-# local_test
+# # local_test

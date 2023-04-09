@@ -44,6 +44,74 @@ class TestCombinatorics < Test::Unit::TestCase
                   ['2', '1', '1', '1'],], obj.to_a)
   end
 
+  def test_placements_work
+    obj = Placements.new '1234', 2
+    assert_equal(12, obj.count)
+    assert_equal(3, obj.count {|p| p[0].to_i - p[1].to_i == 1})
+    
+    obj = Placements.new '123', 2
+    assert_equal(['12', '13', '21',
+                  '23', '31', '32'], obj.to_a.map {|arr| arr.join}.sort)
+  end
+
+  def test_combinations_work
+    obj = Combinations.new '123456', 3 
+    assert_equal(20, obj.count)
+    assert_equal(10, obj.count {|p| p[0] == '1'})
+    
+    obj = Combinations.new '123', 2
+    assert_equal(['12', '13', '23'], obj.to_a.map {|arr| arr.join}.sort)
+  end
+
+  def test_map_iterator
+    map_obj = Placements.new((1..3).to_a, 2).map {|arr| 10 * arr[0] + arr[1]}
+    
+    # Map is Enumerator, not Array
+    assert map_obj.is_a? BaseEnumerator
+    assert_raise(NoMethodError) { map_obj[0] }
+
+    # to_a method
+    assert_equal([12, 13, 21, 23, 31, 32], map_obj.to_a.sort)
+
+    # count method
+    assert_equal(6, map_obj.count)
+    assert_equal(4, map_obj.count {|x| x % 2 == 1})
+
+    # maps can be chained
+    map_obj = map_obj.map {|x| 10 * x}
+    assert_equal([120, 130, 210, 230, 310, 320], map_obj.to_a.sort)
+  end
+
+  def test_filter_iterator
+    filter_obj = Combinations.new((1..5).to_a, 3).filter {|arr| arr.sum >= 10}
+    
+    # Filter is Enumerator, not Array
+    assert filter_obj.is_a? BaseEnumerator
+    assert_raise(NoMethodError) { filter_obj[0] }
+
+    # to_a method
+    assert_equal([[1, 4, 5], [2, 3, 5], [2, 4, 5], [3, 4, 5]], filter_obj.to_a)
+
+    # count method
+    assert_equal(4, filter_obj.count)
+    assert_equal(2, filter_obj.count {|arr| arr.reduce(:*) % 15 == 0})
+
+    # filters can be chained
+    filter_obj = filter_obj.filter {|arr| arr.reduce(:*) % 15 == 0}
+    assert_equal([[2, 3, 5], [3, 4, 5]], filter_obj.to_a)
+  end
+
+  def test_filter_and_map_chain
+    obj = Combinations.new((1..5).to_a, 3)
+
+    map_filter_obj = obj.map {|arr| arr.reduce(:*)}.filter {|num| num % 15 == 0}
+    assert_equal([15, 30, 60], map_filter_obj.to_a)
+
+    filter_map_obj = obj.filter {|arr| arr.reduce(:*) % 15 == 0}.map {|arr| arr.reduce(:+)}
+    assert_equal([9, 10, 12], filter_map_obj.to_a)
+
+  end
+
   def test_covariance
     # assert_in_delta(2.67, covariance([1, 2, 3, 4], [3, 5, 6, 8]), 0.01)
     # assert_in_delta(-2.67, covariance([1, 2, 3, 4], [8, 6, 5, 3]), 0.01)
@@ -116,4 +184,4 @@ end
 
 
 fact_performance_test
-# enumerator_count_performance_test
+# enumerator_count_performance_test  # WARNING: Long test
