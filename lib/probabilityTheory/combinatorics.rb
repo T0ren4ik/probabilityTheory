@@ -48,7 +48,7 @@ module Combinatorics
   end
 
   def combinations_with_replace(n, k)
-    combinations(n + k - 1, k - 1)
+    combinations(n + k - 1, k)
   end
 
   class Permutations < BaseEnumerator
@@ -119,6 +119,41 @@ module Combinatorics
   
   end
 
+  class ReplaceCombinations < Permutations
+    
+    def initialize src, k
+      BaseEnumerator.instance_method(:initialize).bind(self).call(src)
+      @k = k
+      @src.uniq!
+      @start_idxs = (0...(@src.size + @k  - 1)).map {|i| i >= @k ? 1 : 0}
+      @curr_idxs = @start_idxs.dup
+    end
+  
+    private
+  
+    def get_current
+      if @end_not_reached
+        src_idx, q = 0, 0
+        ret = []
+        @curr_idxs.each {|i|
+          if i == 1
+            q.times do
+              ret << @src[src_idx]
+            end
+            src_idx, q = src_idx + 1, 0
+          else
+            q += 1
+          end
+        }
+        q.times do
+          ret << @src[src_idx]
+        end
+        ret
+      end
+    end
+  
+  end
+
 end
 
 # include Combinatorics
@@ -127,16 +162,19 @@ end
 #   # obj = Combinations.new '12345', 2
 #   # puts obj.to_a.inspect
 
-#   obj = Placements.new '1234', 2
-#   # 30.times do
-#   #   v = obj.next
-#   #   puts v.inspect if v
-#   #   puts 'Hi There' if !v
-#   # end
-#   # puts obj.count
-#   puts obj.count {|arr| arr[0] == '1'}
-#   puts obj.to_a.inspect
+#   # obj = Placements.new '1234', 2
+#   # # 30.times do
+#   # #   v = obj.next
+#   # #   puts v.inspect if v
+#   # #   puts 'Hi There' if !v
+#   # # end
+#   # # puts obj.count
+#   # puts obj.count {|arr| arr[0] == '1'}
+#   # puts obj.to_a.inspect
+
+#   # obj = ReplaceCombinations.new '123456', 3
+#   # puts combinations_with_replace(6, 3)
 
 # end
 
-# # local_test
+# local_test

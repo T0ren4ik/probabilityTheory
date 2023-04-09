@@ -34,6 +34,28 @@ class TestCombinatorics < Test::Unit::TestCase
 
   end
 
+  def test_perms_take
+    obj = Permutations.new '123'
+    assert_equal([['1', '2', '3'],
+                  ['1', '3', '2'],
+                  ['2', '1', '3']], obj.take(3))
+    
+    # we can repeat
+    assert_equal([['1', '2', '3'],
+                  ['1', '3', '2'],
+                  ['2', '1', '3']], obj.take(3))
+    
+    # nils if trying to take too much
+    assert_equal([['1', '2', '3'],
+                  ['1', '3', '2'],
+                  ['2', '1', '3'], 
+                  ['2', '3', '1'],
+                  ['3', '1', '2'],
+                  ['3', '2', '1'],
+                  nil, nil, nil], obj.take(9))
+
+  end
+
   def test_replace_perms_also_work
     obj = Permutations.new '1121'
     assert_equal(4, obj.count)
@@ -55,12 +77,21 @@ class TestCombinatorics < Test::Unit::TestCase
   end
 
   def test_combinations_work
-    obj = Combinations.new '123456', 3 
+    obj = Combinations.new '123456', 3
     assert_equal(20, obj.count)
     assert_equal(10, obj.count {|p| p[0] == '1'})
     
     obj = Combinations.new '123', 2
     assert_equal(['12', '13', '23'], obj.to_a.map {|arr| arr.join}.sort)
+  end
+  
+  def test_replace_combinations_work
+    obj = ReplaceCombinations.new '123456', 3
+    assert_equal(56, obj.count)
+    assert_equal(21, obj.count {|p| p[0] == '1'})
+    
+    obj = ReplaceCombinations.new '123', 2
+    assert_equal(['11', '12', '13', '22', '23', '33'], obj.to_a.map {|arr| arr.join})
   end
 
   def test_map_iterator
@@ -112,43 +143,6 @@ class TestCombinatorics < Test::Unit::TestCase
 
   end
 
-  def test_covariance
-    # assert_in_delta(2.67, covariance([1, 2, 3, 4], [3, 5, 6, 8]), 0.01)
-    # assert_in_delta(-2.67, covariance([1, 2, 3, 4], [8, 6, 5, 3]), 0.01)
-  end
-
-  def test_covariance_matrix
-
-    # expected_matrix = [0.5, 0.75, 0.75, 0.75, 1.17, 1.17, 0.75, 1.17, 1.17]
-    # actual_matrix = covariance_matrix([[1, 2, 3], [3, 5, 6], [4, 6, 7]]).flatten
-
-    # expected_matrix.each_with_index do |elem, i|
-    #   assert_in_delta elem, actual_matrix[i], 0.1, "Arrays differ at index #{i}"
-    # end
-
-  end
-
-  def test_total_probability
-    # assert_raises(ArgumentError) { total_probability([0.2, 0.3, 0.4], [0.1, 0.3, 0.6]) }
-  end
-
-  def test_bayes_theorem
-  end
-
-  def test_bernoulli
-  end
-
-  def test_local_laplace
-  end
-
-  def test_integral_laplace
-  end
-
-  def test_conditional_probability
-    # assert_in_delta(0.75, conditional_probability(8, 6, 4), 0.01)
-    # assert_in_delta(0.3, conditional_probability(10, 3, 2), 0.01)
-  end
-
 end
 
 
@@ -184,4 +178,4 @@ end
 
 
 fact_performance_test
-# enumerator_count_performance_test  # WARNING: Long test
+# enumerator_count_performance_test  # WARNING: Long test, about 30 seconds
