@@ -109,7 +109,7 @@ class GameMachine
     return lines_count
   end
 
-
+# отображение экрана игры
   def show_screen
     for i in (0..@screen.length-1)
       for j in (0..@screen[0].length-1)
@@ -121,7 +121,7 @@ class GameMachine
   end
 
 
-
+# статус всех значений
 
 	def print_status
     p '-----------------------------------------'
