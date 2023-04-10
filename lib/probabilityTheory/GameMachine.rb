@@ -121,7 +121,9 @@ class GameMachine
   end
 
 
-# статус всех значений
+	def get_balance
+		@cash_available
+	end
 
 	def print_status
     p '-----------------------------------------'
@@ -168,6 +170,8 @@ def gaming(cash_start, symbols, probability_symbols, rate_bet)
 
   end
 end
+
+srand 1114 # 1 diagonal line
 
 cash_start = 3000
 symbols = ['^', '*', '#', '$', '7']

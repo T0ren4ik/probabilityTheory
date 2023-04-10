@@ -1,6 +1,6 @@
 require 'benchmark'
 
-require_relative './BaseEnumerators.rb' 
+require_relative './BaseEnumerators.rb'
 
 # Module Scheme
 
@@ -21,7 +21,7 @@ require_relative './BaseEnumerators.rb'
 # ReplacePlacements, ReplaceCombinations
 # CartesianProduct, PowerSet
 # shared methods: to_a, filter, map, count (with optional block), (private) next
-# shared attributes: src: array; start_idxs, curr_idxs: index array
+# shared attributes: src: array; start_index, curr_index: index array
 
 module Combinatorics
   @@fact_cache = [1, 1]
@@ -30,93 +30,92 @@ module Combinatorics
     @@fact_cache[n] ||= n * factorial(n - 1)
   end
 
-  def permutations(n, *ks)
+  def permutations_count(n, *ks)
     raise "Too many repetitions: repetitions sum #{ks.sum}, but n is #{n}" if ks.sum > n
     factorial(n) / ks.inject(1) {|acc, k| acc * factorial(k)}
   end
 
-  def placements(n, k)
-    permutations(n, n - k)
+  def placements_count(n, k)
+    permutations_count(n, n - k)
   end
 
-  def placements_with_replace(n, k)
+  def replace_placements_count(n, k)
     n ** k
   end
 
-  def combinations(n, k)
-    permutations(n, n - k, k)
+  def combinations_count(n, k)
+    permutations_count(n, n - k, k)
   end
 
-  def combinations_with_replace(n, k)
-    combinations(n + k - 1, k)
+  def replace_combinations_count(n, k)
+    combinations_count(n + k - 1, k)
   end
 
   class Permutations < BaseEnumerator
-  
+
     def initialize src
       super src
       # the strange assignment needed to handle permutations with replace
-      @start_idxs = (0...src.size).map {|i| @src.index(@src[i])}
-      @curr_idxs = @start_idxs.dup
-      # @total_count = permutations(@src.size)
+      @start_index = (0...src.size).map {|i| @src.index(@src[i])}
+      @curr_index = @start_index.dup
     end
 
     private
-    
+
     def index_forward
       # Narayana algorithm https://ru.wikipedia.org/wiki/%D0%90%D0%BB%D0%B3%D0%BE%D1%80%D0%B8%D1%82%D0%BC_%D0%9D%D0%B0%D1%80%D0%B0%D0%B9%D0%B0%D0%BD%D1%8B
-      idxs = (0...@curr_idxs.size).to_a.reverse
-      j = idxs[1..-1].find {|idx| @curr_idxs[idx] < @curr_idxs[idx + 1]}
+      idxs = (0...@curr_index.size).to_a.reverse
+      j = idxs[1..-1].find {|idx| @curr_index[idx] < @curr_index[idx + 1]}
       if j
-        l = idxs.find {|idx| @curr_idxs[idx] > @curr_idxs[j]}
-        @curr_idxs[j], @curr_idxs[l] = @curr_idxs[l], @curr_idxs[j]
-        @curr_idxs[j+1..-1] = @curr_idxs[j+1..-1].reverse
+        l = idxs.find {|idx| @curr_index[idx] > @curr_index[j]}
+        @curr_index[j], @curr_index[l] = @curr_index[l], @curr_index[j]
+        @curr_index[j+1..-1] = @curr_index[j+1..-1].reverse
       else
         @end_not_reached = false
       end
     end
-  
+
   end
-  
+
   class Placements < Permutations
-    
+
     def initialize src, k
       BaseEnumerator.instance_method(:initialize).bind(self).call(src)
       raise NotImplementedError, "Currently class Placements does not support repetitions in the source iterable" if @src.uniq.size < @src.size
       @k = k
-      @start_idxs = (0...src.size).map {|i| i >= @k ? @k : i}
-      @curr_idxs = @start_idxs.dup
+      @start_index = (0...src.size).map {|i| i >= @k ? @k : i}
+      @curr_index = @start_index.dup
     end
-  
+
     private
-  
+
     def get_current
       if @end_not_reached
-        shrinked = @src.zip(@curr_idxs).filter {|el, i| i < @k}
-        return @curr_idxs.select {|i| i < @k}.map {|idx| shrinked[idx].first}
+        shrinked = @src.zip(@curr_index).filter {|el, i| i < @k}
+        @curr_index.select {|i| i < @k}.map {|idx| shrinked[idx].first}
       end
     end
-  
+
   end
 
   class ReplacePlacements < Permutations
-    
+
     def initialize src, k
       BaseEnumerator.instance_method(:initialize).bind(self).call(src)
       @src.uniq!
       @k, @n = k, @src.size
-      @start_idxs = Array.new @k, 0
-      @curr_idxs = @start_idxs.dup
+      @start_index = Array.new @k, 0
+      @curr_index = @start_index.dup
     end
-  
+
     private
 
     def index_forward
-      if @curr_idxs.min < @n - 1
+      if @curr_index.min < @n - 1
         plus_one_to_next = true
-        @curr_idxs.each_with_index.reverse_each { |el, i|
+        @curr_index.each_with_index.reverse_each { |el, i|
           if plus_one_to_next
-            plus_one_to_next, @curr_idxs[i] = (el + 1).divmod @n
+            plus_one_to_next, @curr_index[i] = (el + 1).divmod @n
             plus_one_to_next = (plus_one_to_next == 1)
           end
         }
@@ -124,44 +123,44 @@ module Combinatorics
         @end_not_reached = false
       end
     end
-  
+
   end
-  
+
   class Combinations < Permutations
-    
+
     def initialize src, k
       BaseEnumerator.instance_method(:initialize).bind(self).call(src)
       raise NotImplementedError, "Currently class Combinations does not support repetitions in the source iterable" if @src.uniq.size < @src.size
       @k = k
-      @start_idxs = (0...src.size).map {|i| i >= @k ? 1 : 0}
-      @curr_idxs = @start_idxs.dup
+      @start_index = (0...src.size).map {|i| i >= @k ? 1 : 0}
+      @curr_index = @start_index.dup
     end
-  
+
     private
-  
+
     def get_current
-      @src.zip(@curr_idxs).filter {|el, i| i == 0}.map {|p| p.first} if @end_not_reached
+      @src.zip(@curr_index).filter {|el, i| i == 0}.map {|p| p.first} if @end_not_reached
     end
-  
+
   end
 
   class ReplaceCombinations < Permutations
-    
+
     def initialize src, k
       BaseEnumerator.instance_method(:initialize).bind(self).call(src)
       @k = k
       @src.uniq!
-      @start_idxs = (0...(@src.size + @k  - 1)).map {|i| i >= @k ? 1 : 0}
-      @curr_idxs = @start_idxs.dup
+      @start_index = (0...(@src.size + @k  - 1)).map {|i| i >= @k ? 1 : 0}
+      @curr_index = @start_index.dup
     end
-  
+
     private
-  
+
     def get_current
       if @end_not_reached
         src_idx, q = 0, 0
         ret = []
-        @curr_idxs.each {|i|
+        @curr_index.each {|i|
           if i == 1
             q.times do
               ret << @src[src_idx]
@@ -177,7 +176,7 @@ module Combinatorics
         ret
       end
     end
-  
+
   end
 
 end
