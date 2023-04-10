@@ -12,6 +12,10 @@ class BaseEnumerator
     @end_not_reached = true
   end
 
+  def help
+    return ' '
+  end
+
   def next
     ret = get_current
     index_forward if ret
