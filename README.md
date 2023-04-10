@@ -220,7 +220,7 @@ dice.count_occurrences(4, 10) #=> 2
 
 ArgumentError is raised if the sides or the number of times argument passed to the initialize, roll_multiple, average_roll, or count_occurrences methods is not a positive integer.
 
-### Modul Features
+### Module Features
 
 This class provides several statistical functions that can be used to calculate different properties of data. Here's a brief overview of each method:
 
@@ -342,7 +342,7 @@ p sum_joint(10, 3, 2)
 # Output:  0.44
 ```
 
-### Modul Сombinatorics
+### Module Сombinatorics
 
 TODO: Write something
 
