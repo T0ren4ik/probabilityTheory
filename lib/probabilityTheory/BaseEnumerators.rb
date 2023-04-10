@@ -12,6 +12,10 @@ class BaseEnumerator
     @end_not_reached = true
   end
 
+  def help
+    return ' '
+  end
+
   def next
     ret = get_current
     index_forward if ret
@@ -45,13 +49,13 @@ class BaseEnumerator
     restart
     ret = 0
     if block_given?
-      loop do 
+      loop do
         next_el = self.next
         break if !next_el
         ret += 1 if yield next_el
       end
     else
-      loop do 
+      loop do
         next_el = self.next
         break if !next_el
         ret += 1
@@ -83,9 +87,9 @@ class BaseEnumerator
 end
 
 class HigherOrderEnumerator < BaseEnumerator
-  
+
   def initialize src_enum, &block
-    raise ArgumentError('Implemented only for BaseEnumerator objects') unless src_enum.is_a? BaseEnumerator 
+    raise ArgumentError('Implemented only for BaseEnumerator objects') unless src_enum.is_a? BaseEnumerator
     @block = block
     @src_enum = src_enum
   end
