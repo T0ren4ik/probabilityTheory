@@ -8,7 +8,7 @@ class BaseEnumerator
       @src = src.dup
     end
     @src.sort!
-    @curr_idxs = @start_idxs = nil
+    @curr_index = @start_index = nil
     @end_not_reached = true
   end
 
@@ -19,7 +19,7 @@ class BaseEnumerator
   end
 
   def restart
-    @curr_idxs.fill {|i| @start_idxs[i]}
+    @curr_index.fill {|i| @start_index[i]}
     @end_not_reached = true
   end
 
@@ -45,13 +45,13 @@ class BaseEnumerator
     restart
     ret = 0
     if block_given?
-      loop do 
+      loop do
         next_el = self.next
         break if !next_el
         ret += 1 if yield next_el
       end
     else
-      loop do 
+      loop do
         next_el = self.next
         break if !next_el
         ret += 1
@@ -72,7 +72,7 @@ class BaseEnumerator
 
   def get_current
     # WARNING: Should return nil if not @end_not_reached. Otherwise there would be endless loop
-    @end_not_reached ? @curr_idxs.map {|i| @src[i]} : nil
+    @end_not_reached ? @curr_index.map {|i| @src[i]} : nil
   end
 
   def index_forward
@@ -83,9 +83,9 @@ class BaseEnumerator
 end
 
 class HigherOrderEnumerator < BaseEnumerator
-  
+
   def initialize src_enum, &block
-    raise ArgumentError('Implemented only for BaseEnumerator objects') unless src_enum.is_a? BaseEnumerator 
+    raise ArgumentError('Implemented only for BaseEnumerator objects') unless src_enum.is_a? BaseEnumerator
     @block = block
     @src_enum = src_enum
   end
