@@ -60,13 +60,11 @@ module Combinatorics
       @curr_idxs = @start_idxs.dup
       # @total_count = permutations(@src.size)
     end
-  
-    # CLASS METHODS
 
     private
     
     def index_forward
-      # Narayana algorithm
+      # Narayana algorithm https://ru.wikipedia.org/wiki/%D0%90%D0%BB%D0%B3%D0%BE%D1%80%D0%B8%D1%82%D0%BC_%D0%9D%D0%B0%D1%80%D0%B0%D0%B9%D0%B0%D0%BD%D1%8B
       idxs = (0...@curr_idxs.size).to_a.reverse
       j = idxs[1..-1].find {|idx| @curr_idxs[idx] < @curr_idxs[idx + 1]}
       if j
@@ -96,6 +94,34 @@ module Combinatorics
       if @end_not_reached
         shrinked = @src.zip(@curr_idxs).filter {|el, i| i < @k}
         return @curr_idxs.select {|i| i < @k}.map {|idx| shrinked[idx].first}
+      end
+    end
+  
+  end
+
+  class ReplacePlacements < Permutations
+    
+    def initialize src, k
+      BaseEnumerator.instance_method(:initialize).bind(self).call(src)
+      @src.uniq!
+      @k, @n = k, @src.size
+      @start_idxs = Array.new @k, 0
+      @curr_idxs = @start_idxs.dup
+    end
+  
+    private
+
+    def index_forward
+      if @curr_idxs.min < @n - 1
+        plus_one_to_next = true
+        @curr_idxs.each_with_index.reverse_each { |el, i|
+          if plus_one_to_next
+            plus_one_to_next, @curr_idxs[i] = (el + 1).divmod @n
+            plus_one_to_next = (plus_one_to_next == 1)
+          end
+        }
+      else
+        @end_not_reached = false
       end
     end
   
@@ -169,11 +195,16 @@ end
 #   # #   puts 'Hi There' if !v
 #   # # end
 #   # # puts obj.count
-#   # puts obj.count {|arr| arr[0] == '1'}
-#   # puts obj.to_a.inspect
 
 #   # obj = ReplaceCombinations.new '123456', 3
 #   # puts combinations_with_replace(6, 3)
+
+#   obj = ReplacePlacements.new '1234', 2
+#   20.times do
+#     v = obj.next
+#     puts v.inspect if v
+#     puts 'Hi There' if !v
+#   end
 
 # end
 

@@ -71,11 +71,12 @@ class BaseEnumerator
   private
 
   def get_current
+    # WARNING: Should return nil if not @end_not_reached. Otherwise there would be endless loop
     @end_not_reached ? @curr_idxs.map {|i| @src[i]} : nil
   end
 
   def index_forward
-    # Should set @end_not_reached to false if unable to move forward
+    # WARNING: Should set @end_not_reached to false if unable to move forward. Otherwise there would be endless loop
     raise NotImplementedError
   end
 

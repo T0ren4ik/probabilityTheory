@@ -76,6 +76,17 @@ class TestCombinatorics < Test::Unit::TestCase
                   '23', '31', '32'], obj.to_a.map {|arr| arr.join}.sort)
   end
 
+  def test_replace_placements_work
+    obj = ReplacePlacements.new '12345', 3
+    assert_equal(125, obj.count)
+    assert_equal(20, obj.count {|p| p[0].to_i - p[1].to_i == 1})
+    
+    obj = ReplacePlacements.new '123', 2
+    assert_equal(['11', '12', '13',
+                  '21', '22', '23',
+                  '31', '32', '33'], obj.to_a.map {|arr| arr.join})
+  end
+
   def test_combinations_work
     obj = Combinations.new '123456', 3
     assert_equal(20, obj.count)
