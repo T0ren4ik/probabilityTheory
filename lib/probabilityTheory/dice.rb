@@ -37,7 +37,7 @@ class Dice
   
   def count_occurrences(value, times)
     raise ArgumentError, "Value must be a positive integer" unless value.is_a?(Integer) && value > 0
-    raise ArgumentError, "Times must be a positive integer" unless times.is_a?(Integer) && value > 0
+    raise ArgumentError, "Times must be a positive integer" unless times.is_a?(Integer) && times > 0
     count = 0
     times.times do
       count += 1 if roll == value

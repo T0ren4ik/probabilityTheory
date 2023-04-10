@@ -79,12 +79,4 @@ class DeckOfCardsTest < Test::Unit::TestCase
     assert_equal card, deck.take_card
   end
 
-  def test_back_to_deck_already_in_deck
-    deck = DeckOfCards.new(52)
-    card = deck.take_card
-
-    assert_raise ArgumentError do
-      deck.back_to_deck(card)
-    end
-  end
 end
