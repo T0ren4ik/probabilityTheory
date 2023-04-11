@@ -23,7 +23,7 @@ class BaseEnumerator
   end
 
   def restart
-    @curr_index.fill {|i| @start_index[i]}
+    @curr_index = @start_index.dup
     @end_not_reached = true
   end
 
@@ -76,7 +76,7 @@ class BaseEnumerator
 
   def get_current
     # WARNING: Should return nil if not @end_not_reached. Otherwise there would be endless loop
-    @end_not_reached ? @curr_index.map {|i| @src[i]} : nil
+    raise NotImplementedError
   end
 
   def index_forward

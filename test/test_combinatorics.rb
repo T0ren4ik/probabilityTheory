@@ -158,6 +158,30 @@ class TestCombinatorics < Test::Unit::TestCase
     assert_equal(['11', '12', '13', '22', '23', '33'], obj.to_a.map {|arr| arr.join})
   end
 
+  # Cartesian product
+  def test_cartesian_product_work
+    obj = CartesianProduct.new '1234', [1, 2, 3], ['12', 13]
+    assert_equal(24, obj.count)
+    assert_equal(6, obj.count {|p| p[0] == '1'})
+
+    obj = CartesianProduct.new '123', ['12', 13]
+    assert_equal([['1', '12'], ['1', 13], ['2', '12'],
+                  ['2', 13], ['3', '12'], ['3', 13], ], obj.to_a)
+  end
+
+  # Powerset
+  def test_powerset_work
+    obj = Powerset.new((1..6).to_a)
+    assert_equal(64, obj.count)
+    assert_equal(32, obj.count {|p| p.include? 1})
+
+    obj = Powerset.new [1, 2, 3]
+    assert_equal([[],
+                  [1], [2], [2, 1],
+                  [3], [3, 1], [3, 2], 
+                  [3, 2, 1]], obj.to_a)
+  end
+
   # Higher order enumerators
 
   # Map

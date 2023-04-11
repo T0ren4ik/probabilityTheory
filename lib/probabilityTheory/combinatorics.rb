@@ -60,7 +60,16 @@ module Combinatorics
       @curr_index = @start_index.dup
     end
 
+    def restart
+      @curr_index.fill {|i| @start_index[i]}
+      @end_not_reached = true
+    end
+
     private
+
+    def get_current
+      @end_not_reached ? @curr_index.map {|i| @src[i]} : nil
+    end
 
     def index_forward
       # Narayana algorithm https://ru.wikipedia.org/wiki/%D0%90%D0%BB%D0%B3%D0%BE%D1%80%D0%B8%D1%82%D0%BC_%D0%9D%D0%B0%D1%80%D0%B0%D0%B9%D0%B0%D0%BD%D1%8B
@@ -105,17 +114,18 @@ module Combinatorics
       @src.uniq!
       @k, @n = k, @src.size
       @start_index = Array.new @k, 0
+      @max_index = Array.new @k, @n - 1
       @curr_index = @start_index.dup
     end
 
     private
 
     def index_forward
-      if @curr_index.min < @n - 1
+      if @curr_index != @max_index
         plus_one_to_next = true
         @curr_index.each_with_index.reverse_each { |el, i|
           if plus_one_to_next
-            plus_one_to_next, @curr_index[i] = (el + 1).divmod @n
+            plus_one_to_next, @curr_index[i] = (el + 1).divmod(@max_index[i] + 1)
             plus_one_to_next = (plus_one_to_next == 1)
           end
         }
@@ -179,6 +189,54 @@ module Combinatorics
 
   end
 
+  class CartesianProduct < ReplacePlacements
+
+    def initialize *source_arrays
+      @max_index = []
+      source_arrays.each_with_index { |iter, i|
+        source_arrays[i] = iter.chars if iter.is_a? String
+        if !(source_arrays[i].is_a? Array)
+          raise ArgumentError, "CartesianProduct argument should be a string or an Array, but #{source_arrays[i]} was received"
+        end
+        source_arrays[i].uniq!
+        @max_index << source_arrays[i].size - 1
+      }
+      @src = source_arrays
+      @start_index = Array.new @src.size, 0
+      @curr_index = @start_index.dup
+      @end_not_reached = true
+    end
+
+    private
+
+    def get_current
+      if @end_not_reached
+        @curr_index.each_with_index.map {|ind, i| @src[i][ind]}
+      end
+    end
+
+  end
+
+  class Powerset < ReplacePlacements
+
+    def initialize src
+      BaseEnumerator.instance_method(:initialize).bind(self).call(src)
+      @src = @src.uniq.reverse
+      @start_index = Array.new @src.size, 0
+      @max_index = Array.new @src.size, 1
+      @curr_index = @start_index.dup
+    end
+
+    private
+
+    def get_current
+      if @end_not_reached
+        @curr_index.each_with_index.map {|ind, i| ind == 1 ? @src[i] : nil}.compact
+      end
+    end
+
+  end
+
 end
 
 # include Combinatorics
@@ -198,8 +256,22 @@ end
 #   # obj = ReplaceCombinations.new '123456', 3
 #   # puts combinations_with_replace(6, 3)
 
-#   obj = ReplacePlacements.new '1234', 2
-#   20.times do
+#   # obj = ReplacePlacements.new '1234', 2
+#   # 20.times do
+#   #   v = obj.next
+#   #   puts v.inspect if v
+#   #   puts 'Hi There' if !v
+#   # end
+
+#   # obj = CartesianProduct.new '1234', [1, 2], ['12', 30]
+#   # 40.times do
+#   #   v = obj.next
+#   #   puts v.inspect if v
+#   #   puts 'Hi There' if !v
+#   # end
+
+#   obj = Powerset.new '12345'
+#   40.times do
 #     v = obj.next
 #     puts v.inspect if v
 #     puts 'Hi There' if !v
