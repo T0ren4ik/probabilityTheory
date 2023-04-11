@@ -19,7 +19,7 @@ require_relative './BaseEnumerators.rb'
 # API classes
 # Permutations, Placements, Combinations
 # ReplacePlacements, ReplaceCombinations
-# CartesianProduct, PowerSet
+# CartesianProduct, Powerset
 # shared methods: to_a, filter, map, count (with optional block), (private) next
 # shared attributes: src: array; start_index, curr_index: index array
 
@@ -40,6 +40,7 @@ module Combinatorics
   end
 
   def replace_placements_count(n, k)
+    raise ArgumentError, "Wrong arguments for placements count: #{n} #{k}" unless !n.negative? && !k.negative?
     n ** k
   end
 
@@ -62,11 +63,16 @@ module Combinatorics
 
     def restart
       @curr_index.fill {|i| @start_index[i]}
-      @end_not_reached = true
+      @end_not_reached = self.set_end_not_reached
     end
 
     private
 
+    def set_end_not_reached
+      # Logic to handle bad initialize arguments
+      (@src.size > 0) && (!@k || @k > 0)
+    end
+  
     def get_current
       @end_not_reached ? @curr_index.map {|i| @src[i]} : nil
     end
@@ -91,6 +97,7 @@ module Combinatorics
     def initialize src, k
       BaseEnumerator.instance_method(:initialize).bind(self).call(src)
       raise NotImplementedError, "Currently class Placements does not support repetitions in the source iterable" if @src.uniq.size < @src.size
+      raise ArgumentError, "Cannot built placements per #{k} from #{@src.size}" if k < 0 || k > @src.size
       @k = k
       @start_index = (0...src.size).map {|i| i >= @k ? @k : i}
       @curr_index = @start_index.dup
@@ -111,6 +118,7 @@ module Combinatorics
 
     def initialize src, k
       BaseEnumerator.instance_method(:initialize).bind(self).call(src)
+      raise ArgumentError, "Cannot built replace placements per #{k} from #{@src.size}" if k < 0
       @src.uniq!
       @k, @n = k, @src.size
       @start_index = Array.new @k, 0
@@ -141,6 +149,7 @@ module Combinatorics
     def initialize src, k
       BaseEnumerator.instance_method(:initialize).bind(self).call(src)
       raise NotImplementedError, "Currently class Combinations does not support repetitions in the source iterable" if @src.uniq.size < @src.size
+      raise ArgumentError, "Cannot built combinations per #{k} from #{@src.size}" if k < 0 || k > @src.size
       @k = k
       @start_index = (0...src.size).map {|i| i >= @k ? 1 : 0}
       @curr_index = @start_index.dup
@@ -151,13 +160,14 @@ module Combinatorics
     def get_current
       @src.zip(@curr_index).filter {|el, i| i == 0}.map {|p| p.first} if @end_not_reached
     end
-
+ 
   end
 
   class ReplaceCombinations < Permutations
 
     def initialize src, k
       BaseEnumerator.instance_method(:initialize).bind(self).call(src)
+      raise ArgumentError, "Cannot built replace combinations per #{k} from #{@src.size}" if k < 0
       @k = k
       @src.uniq!
       @start_index = (0...(@src.size + @k  - 1)).map {|i| i >= @k ? 1 : 0}
@@ -204,10 +214,15 @@ module Combinatorics
       @src = source_arrays
       @start_index = Array.new @src.size, 0
       @curr_index = @start_index.dup
-      @end_not_reached = true
+      @end_not_reached = self.set_end_not_reached
     end
 
     private
+
+    def set_end_not_reached
+      # Logic to handle bad initialize arguments
+      (@src.all? {|arr| arr.size > 0}) && (@src.size > 0)
+    end
 
     def get_current
       if @end_not_reached

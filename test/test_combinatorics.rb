@@ -66,7 +66,7 @@ class TestCombinatorics < Test::Unit::TestCase
 
   # API classes
 
-  # Permutattions
+  # Permutations
   def test_perms_count
     obj = Permutations.new '1234'
     assert_equal(24, obj.count)
@@ -180,6 +180,32 @@ class TestCombinatorics < Test::Unit::TestCase
                   [1], [2], [2, 1],
                   [3], [3, 1], [3, 2], 
                   [3, 2, 1]], obj.to_a)
+  end
+
+  def test_what_if_bad_src_iters
+    assert_equal([], Permutations.new([]).to_a)
+    assert_raise(ArgumentError) {Placements.new([], 2)}
+    assert_equal([], Placements.new([], 0).to_a)
+    assert_equal([], ReplacePlacements.new([], 2).to_a)
+    assert_raise(ArgumentError) {Combinations.new([], 2)}
+    assert_equal([], Combinations.new([], 0).to_a)
+    assert_equal([], ReplaceCombinations.new([], 3).to_a)
+    assert_equal([], CartesianProduct.new().to_a)
+    assert_equal([], CartesianProduct.new([1, 2], [], [1, 2]).to_a)
+    assert_equal([], Powerset.new([]).to_a)
+  end
+
+  def test_what_if_bad_numbers
+    assert_equal([], Placements.new([1, 2, 3], 0).to_a)
+    assert_raise(ArgumentError) {Placements.new([1, 2, 3], -1)}
+    assert_raise(ArgumentError) {Placements.new([1, 2, 3], 4)}
+    assert_equal([], ReplacePlacements.new([1, 2, 3], 0).to_a)
+    assert_raise(ArgumentError) {ReplacePlacements.new([1, 2, 3], -1)}
+    assert_equal([], Combinations.new([1, 2, 3], 0).to_a)
+    assert_raise(ArgumentError) {Combinations.new([1, 2, 3], -1)}
+    assert_raise(ArgumentError) {Combinations.new([1, 2, 3], 4)}
+    assert_equal([], ReplaceCombinations.new([1, 2, 3], 0).to_a)
+    assert_raise(ArgumentError) {ReplaceCombinations.new([1, 2, 3], -1)}
   end
 
   # Higher order enumerators

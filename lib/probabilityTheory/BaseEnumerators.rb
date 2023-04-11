@@ -9,7 +9,7 @@ class BaseEnumerator
     end
     @src.sort!
     @curr_index = @start_index = nil
-    @end_not_reached = true
+    @end_not_reached = self.set_end_not_reached
   end
 
   def help
@@ -24,7 +24,7 @@ class BaseEnumerator
 
   def restart
     @curr_index = @start_index.dup
-    @end_not_reached = true
+    @end_not_reached = self.set_end_not_reached
   end
 
   def take n=1
@@ -73,6 +73,11 @@ class BaseEnumerator
   end
 
   private
+
+  def set_end_not_reached
+    # Logic to handle bad initialize arguments
+    raise NotImplementedError
+  end
 
   def get_current
     # WARNING: Should return nil if not @end_not_reached. Otherwise there would be endless loop
