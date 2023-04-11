@@ -20,7 +20,8 @@ require_relative './BaseEnumerators.rb'
 # Permutations, Placements, Combinations
 # ReplacePlacements, ReplaceCombinations
 # CartesianProduct, Powerset
-# shared methods: to_a, filter, map, count (with optional block), (private) next
+# shared public methods: to_a, filter, map, take_while, drop_while,
+#   count (with optional block), next, restart
 # shared attributes: src: array; start_index, curr_index: index array
 
 module Combinatorics
@@ -257,26 +258,6 @@ end
 # include Combinatorics
 
 # def local_test
-#   # obj = Combinations.new '12345', 2
-#   # puts obj.to_a.inspect
-
-#   # obj = Placements.new '1234', 2
-#   # # 30.times do
-#   # #   v = obj.next
-#   # #   puts v.inspect if v
-#   # #   puts 'Hi There' if !v
-#   # # end
-#   # # puts obj.count
-
-#   # obj = ReplaceCombinations.new '123456', 3
-#   # puts combinations_with_replace(6, 3)
-
-#   # obj = ReplacePlacements.new '1234', 2
-#   # 20.times do
-#   #   v = obj.next
-#   #   puts v.inspect if v
-#   #   puts 'Hi There' if !v
-#   # end
 
 #   # obj = CartesianProduct.new '1234', [1, 2], ['12', 30]
 #   # 40.times do
@@ -285,12 +266,14 @@ end
 #   #   puts 'Hi There' if !v
 #   # end
 
-#   obj = Powerset.new '12345'
-#   40.times do
-#     v = obj.next
-#     puts v.inspect if v
-#     puts 'Hi There' if !v
-#   end
+#   # obj = Powerset.new '12345'
+#   # 40.times do
+#   #   v = obj.next
+#   #   puts v.inspect if v
+#   #   puts 'Hi There' if !v
+#   # end
+
+#   puts Permutations.new([1]).to_a.inspect
 
 # end
 

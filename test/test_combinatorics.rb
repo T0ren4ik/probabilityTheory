@@ -182,7 +182,8 @@ class TestCombinatorics < Test::Unit::TestCase
                   [3, 2, 1]], obj.to_a)
   end
 
-  def test_what_if_bad_src_iters
+  # Edge cases
+  def test_if_empty_src_iter
     assert_equal([], Permutations.new([]).to_a)
     assert_raise(ArgumentError) {Placements.new([], 2)}
     assert_equal([], Placements.new([], 0).to_a)
@@ -195,7 +196,22 @@ class TestCombinatorics < Test::Unit::TestCase
     assert_equal([], Powerset.new([]).to_a)
   end
 
-  def test_what_if_bad_numbers
+  def test_if_src_iter_is_of_size_one
+    assert_equal([[1]], Permutations.new([1]).to_a)
+    assert_raise(ArgumentError) {Placements.new([1], 2)}
+    assert_equal([[1]], Placements.new([1], 1).to_a)
+    assert_equal([[1]], ReplacePlacements.new([1], 1).to_a)
+    assert_equal([[1, 1]], ReplacePlacements.new([1], 2).to_a)
+    assert_raise(ArgumentError) {Combinations.new([1], 2)}
+    assert_equal([[1]], Combinations.new([1], 1).to_a)
+    assert_equal([[1]], ReplaceCombinations.new([1], 1).to_a)
+    assert_equal([[1, 1, 1]], ReplaceCombinations.new([1], 3).to_a)
+    assert_equal([[1]], CartesianProduct.new([1]).to_a)
+    assert_equal([[1, 2, 3]], CartesianProduct.new([1], [2], [3]).to_a)
+    assert_equal([[], [1]], Powerset.new([1]).to_a)
+  end
+
+  def test_if_bad_numbers
     assert_equal([], Placements.new([1, 2, 3], 0).to_a)
     assert_raise(ArgumentError) {Placements.new([1, 2, 3], -1)}
     assert_raise(ArgumentError) {Placements.new([1, 2, 3], 4)}
@@ -259,6 +275,82 @@ class TestCombinatorics < Test::Unit::TestCase
 
     filter_map_obj = obj.filter {|arr| arr.reduce(:*) % 15 == 0}.map {|arr| arr.reduce(:+)}
     assert_equal([9, 10, 12], filter_map_obj.to_a)
+
+  end
+
+  def test_take_while_iterator
+    obj = ReplacePlacements.new(3, 3).take_while {|arr| arr[0] == 1}
+
+    # TakeWhile is Enumerator, not Array
+    assert obj.is_a? BaseEnumerator
+    assert_raise(NoMethodError) { obj[0] }
+
+    # to_a method
+    assert_equal([[1, 1, 1], [1, 1, 2], [1, 1, 3],
+                  [1, 2, 1], [1, 2, 2], [1, 2, 3],
+                  [1, 3, 1], [1, 3, 2], [1, 3, 3]], obj.to_a)
+
+    # count method
+    assert_equal(9, obj.count)
+    assert_equal(6, obj.count {|arr| arr[1] % 2 == 1})
+
+    # can be chained with any iterators
+    one_more_obj = obj.filter {|arr| arr[1] >= arr[2]}
+    assert_equal(6, one_more_obj.count)
+
+    one_more_obj = obj.map {|arr| arr.zip([100, 10, 1]).map {|v1, v2| v1 * v2}.reduce :+}
+    assert_equal([111, 112, 113, 121, 122, 123, 131, 132, 133], one_more_obj.to_a)
+    
+    # even longer chain
+    one_more_obj = obj\
+                      .filter {|arr| arr[1] >= arr[2]}\
+                      .map {|arr| arr.zip([100, 10, 1]).map {|v1, v2| v1 * v2}.reduce :+}
+    assert_equal([111, 121, 122, 131, 132, 133], one_more_obj.to_a)
+
+  end
+
+  def test_drop_while_iterator
+    obj = ReplacePlacements.new(3, 3).drop_while {|arr| arr[0] < 3}
+
+    # DropWhile is Enumerator, not Array
+    assert obj.is_a? BaseEnumerator
+    assert_raise(NoMethodError) { obj[0] }
+
+    # to_a method
+    assert_equal([[3, 1, 1], [3, 1, 2], [3, 1, 3],
+                  [3, 2, 1], [3, 2, 2], [3, 2, 3],
+                  [3, 3, 1], [3, 3, 2], [3, 3, 3]], obj.to_a)
+
+    # count method
+    assert_equal(9, obj.count)
+    assert_equal(6, obj.count {|arr| arr[1] % 2 == 1})
+
+    # can be chained with any iterators
+    one_more_obj = obj.filter {|arr| arr[1] >= arr[2]}
+    assert_equal(6, one_more_obj.count)
+
+    one_more_obj = obj.map {|arr| arr.zip([100, 10, 1]).map {|v1, v2| v1 * v2}.reduce :+}
+    assert_equal([311, 312, 313, 321, 322, 323, 331, 332, 333], one_more_obj.to_a)
+    
+    # even longer chain
+    one_more_obj = obj\
+                      .filter {|arr| arr[1] >= arr[2]}\
+                      .map {|arr| arr.zip([100, 10, 1]).map {|v1, v2| v1 * v2}.reduce :+}
+    assert_equal([311, 321, 322, 331, 332, 333], one_more_obj.to_a)
+
+  end
+
+  def test_take_plus_drop
+    obj = ReplacePlacements.new(3, 3)\
+      .drop_while {|arr| arr[0] == 1}
+      .take_while {|arr| arr[1] == 1}
+    assert_equal([[2, 1, 1], [2, 1, 2], [2, 1, 3]], obj.to_a)
+
+    obj = ReplacePlacements.new(3, 3)\
+      .take_while {|arr| arr[0] == 1}
+      .drop_while {|arr| arr[1] == 1}
+    assert_equal([[1, 2, 1], [1, 2, 2], [1, 2, 3], 
+                  [1, 3, 1], [1, 3, 2], [1, 3, 3], ], obj.to_a)
 
   end
 
