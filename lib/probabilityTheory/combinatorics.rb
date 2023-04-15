@@ -10,11 +10,11 @@ require_relative './BaseEnumerators.rb'
 # Map, Filter, TakeWhile, DropWhile
 
 # API funcs
-# permutations_count (n, [k1, k2, ...])
-# placements_count (n, k)
-# replace_placements_count (n, k)
-# combinations_count (n, k)
-# replace_combinations_count (n, k)
+# permutations_count(n, [k1, k2, ...])
+# placements_count(n, k)
+# replace_placements_count(n, k)
+# combinations_count(n, k)
+# replace_combinations_count(n, k)
 
 # API classes
 # Permutations, Placements, Combinations

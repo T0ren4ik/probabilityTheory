@@ -344,7 +344,7 @@ p sum_joint(10, 3, 2)
 
 ### Module Сombinatorics
 
-The module combinatorics implements the following functionality:
+The module implements the following functionality:
 * functions realizing combinatoric formulas
 * enumerators generating combinanatoric entities given source iterable or natural number
 * higher order enumerators helping to efficiently manipulate mentioned enumerators using lazy calculations principles
@@ -354,11 +354,31 @@ Let's go through all the parts one by one
 #### Count combinatoric entities
 
 Here a set of functions counting combinatoric entities is presented
-* `permutations_count (n, [k1, k2, ...])`: counts permutations using a formula $P(n) = n!$. Also counts permutations with replace by a formula $P(n, k1..kn) = n! / (k1! * ... * kn!)$.
-* `placements_count (n, k)`: counts placements using a formula $A(n, k) = n! / (n - k)!$.
-* `replace_placements_count (n, k)`: counts replace_placements using a formula $A(n, k) = n^{k}$.
-* `combinations_count (n, k)`: counts combinations using a formula $C(n, k) = n! / (n - k)! / k!$.
-* `replace_combinations_count (n, k)`: counts replace_combinations using a formula $C(n, k) = n ^ k$.
+* `permutations_count(n, [k1, k2, ...])`: counts permutations using a formula $P(n) = n!$. Also counts permutations with replace by a formula $P(n, k_{1}..k_{n}) = \frac{n!}{k_{1}! ... k_{n}!}$.
+* `placements_count(n, k)`: counts placements using a formula $A(n, k) = \frac{n!}{(n - k)!}$.
+* `replace_placements_count(n, k)`: counts replace_placements using a formula $\bar{A}(n, k) = n^{k}$.
+* `combinations_count(n, k)`: counts combinations using a formula $C(n, k) = \frac{n!}{(n - k)!k!}$.
+* `replace_combinations_count(n, k)`: counts replace_combinations using a formula $\bar{C}(n, k) = C(n + k -1, k)$.
+
+Code examples:
+```Ruby
+permutations_count(1)  # 1
+permutations_count(6)  # 720
+permutations_count(5, 2, 2)  # 30
+
+placements_count(8, 2)  # 56
+placements_count(6, 5)  # 720
+
+replace_placements_count(2, 5)  # 32
+replace_placements_count(10, 4)  # 10_000
+
+combinations_count(4, 2)  # 6
+combinations_count(10, 7)  # 120
+
+replace_combinations_count(3, 5)  # 21
+replace_combinations_count(5, 6)  # 210
+
+```
 
 ## Contributing
 
