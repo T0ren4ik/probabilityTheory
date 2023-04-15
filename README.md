@@ -344,7 +344,21 @@ p sum_joint(10, 3, 2)
 
 ### Module Сombinatorics
 
-TODO: Write something
+The module combinatorics implements the following functionality:
+* functions realizing combinatoric formulas
+* enumerators generating combinanatoric entities given source iterable or natural number
+* higher order enumerators helping to efficiently manipulate mentioned enumerators using lazy calculations principles
+
+Let's go through all the parts one by one
+
+#### Count combinatoric entities
+
+Here a set of functions counting combinatoric entities is presented
+* `permutations_count (n, [k1, k2, ...])`: counts permutations using a formula $P(n) = n!$. Also counts permutations with replace by a formula $P(n, k1..kn) = n! / (k1! * ... * kn!)$.
+* `placements_count (n, k)`: counts placements using a formula $A(n, k) = n! / (n - k)!$.
+* `replace_placements_count (n, k)`: counts replace_placements using a formula $A(n, k) = n^{k}$.
+* `combinations_count (n, k)`: counts combinations using a formula $C(n, k) = n! / (n - k)! / k!$.
+* `replace_combinations_count (n, k)`: counts replace_combinations using a formula $C(n, k) = n ^ k$.
 
 ## Contributing
 

@@ -1,5 +1,3 @@
-require 'benchmark'
-
 require_relative './BaseEnumerators.rb'
 
 # Module Scheme
@@ -9,12 +7,14 @@ require_relative './BaseEnumerators.rb'
 
 # base and util classes
 # BaseEnumerator
-# Map, Filter
+# Map, Filter, TakeWhile, DropWhile
 
 # API funcs
-# permutations (n, [k1, k2, ...])
-# placements (n, k, with_replace: bool)
-# combinations (n, k, with_replace: bool)
+# permutations_count (n, [k1, k2, ...])
+# placements_count (n, k)
+# replace_placements_count (n, k)
+# combinations_count (n, k)
+# replace_combinations_count (n, k)
 
 # API classes
 # Permutations, Placements, Combinations
@@ -22,7 +22,6 @@ require_relative './BaseEnumerators.rb'
 # CartesianProduct, Powerset
 # shared public methods: to_a, filter, map, take_while, drop_while,
 #   count (with optional block), next, restart
-# shared attributes: src: array; start_index, curr_index: index array
 
 module Combinatorics
   @@fact_cache = [1, 1]
@@ -53,6 +52,8 @@ module Combinatorics
     combinations_count(n + k - 1, k)
   end
 
+  BaseEnumerator = BaseEnumerator::BaseEnumerator
+
   class Permutations < BaseEnumerator
 
     def initialize src
@@ -70,7 +71,7 @@ module Combinatorics
     private
 
     def set_end_not_reached
-      # Logic to handle bad initialize arguments
+      # Supposed to return false if bad initialize arguments
       (@src.size > 0) && (!@k || @k > 0)
     end
   
@@ -221,7 +222,7 @@ module Combinatorics
     private
 
     def set_end_not_reached
-      # Logic to handle bad initialize arguments
+      # Supposed to return false if bad initialize arguments
       (@src.all? {|arr| arr.size > 0}) && (@src.size > 0)
     end
 
@@ -237,7 +238,8 @@ module Combinatorics
 
     def initialize src
       BaseEnumerator.instance_method(:initialize).bind(self).call(src)
-      @src = @src.uniq.reverse
+      raise NotImplementedError, "Currently class Powerset does not support repetitions in the source iterable" if @src.uniq.size < @src.size
+      @src = @src.reverse
       @start_index = Array.new @src.size, 0
       @max_index = Array.new @src.size, 1
       @curr_index = @start_index.dup
@@ -255,9 +257,10 @@ module Combinatorics
 
 end
 
-# include Combinatorics
 
 # def local_test
+
+#   include Combinatorics
 
 #   # obj = CartesianProduct.new '1234', [1, 2], ['12', 30]
 #   # 40.times do

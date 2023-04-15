@@ -226,6 +226,8 @@ class TestCombinatorics < Test::Unit::TestCase
 
   # Higher order enumerators
 
+  BaseEnumerator = EnumTools::BaseEnumerator
+
   # Map
   def test_map_iterator
     map_obj = Placements.new((1..3).to_a, 2).map {|arr| 10 * arr[0] + arr[1]}
