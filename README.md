@@ -158,6 +158,53 @@ rescue ArgumentError => e
 end
 ```
 
+### Usage guide for GameMachine
+
+The GameMachine class allows you to simulate playing slots like in a real casino
+
+#### Creating a GameMachine
+
+To create a new game machine, create an instance of the GameMachine class, 
+passing in the "cash start" - number of money, than you want in the machine, symbols - views in machine, their probability and rate bet (if you win, than your bet multiple to rate bet)
+```Ruby
+casino = GameMachine.new(cash_start, symbols, probability_symbols, rate_bet)
+```
+
+#### GameMachine spin
+
+To spin the game, call the spin method:
+```Ruby
+casino.spin
+```
+
+#### Show screen
+To show machine status in view, call the show_screen method:
+
+```Ruby
+casino.show_screen
+```
+
+#### Show status
+To show machine variables status, call the print_status method:
+```Ruby
+casino.print_status
+```
+
+#### Set new bet
+
+To set new bet call set_bet method:
+
+```Ruby
+casino.set_bet(bet_value)
+```
+
+Default view of machine:
+7   #   7
+#   7   #
+7   7   #
+
+
+
 ### Usage Guide for Dice Class
 
 The Dice class represents a standard dice with a specified number of sides. It can be used to roll a dice, get the last roll result, roll the dice multiple times, calculate the average roll value, and count the number of occurrences of a specific value in a number of rolls.
