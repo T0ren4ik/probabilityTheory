@@ -345,20 +345,20 @@ p sum_joint(10, 3, 2)
 ### Module Сombinatorics
 
 The module implements the following functionality:
-* functions realizing combinatoric formulas
-* enumerators generating combinanatoric entities given source iterable or natural number
+* functions realizing combinatorial formulas
+* enumerators generating combinatorial entities given source iterable or natural number
 * higher order enumerators helping to efficiently manipulate mentioned enumerators using lazy calculations principles
 
 Let's go through all the parts one by one
 
-#### Count combinatoric entities
+#### Count combinatorial entities
 
-Here a set of functions counting combinatoric entities is presented
+Here a set of functions counting combinatorial entities is presented
 * `permutations_count(n, [k1, k2, ...])`: counts permutations using a formula $P(n) = n!$. Also counts permutations with replace by a formula $P(n, k_{1}..k_{n}) = \frac{n!}{k_{1}! ... k_{n}!}$.
 * `placements_count(n, k)`: counts placements using a formula $A(n, k) = \frac{n!}{(n - k)!}$.
-* `replace_placements_count(n, k)`: counts replace_placements using a formula $\bar{A}(n, k) = n^{k}$.
-* `combinations_count(n, k)`: counts combinations using a formula $C(n, k) = \frac{n!}{(n - k)!k!}$.
-* `replace_combinations_count(n, k)`: counts replace_combinations using a formula $\bar{C}(n, k) = C(n + k -1, k)$.
+* `replace_placements_count(n, k)`: counts placements with replace using a formula $\bar{A}(n, k) = n^{k}$.
+* `combinations_count(n, k)`: counts combinations using a formula $C(n, k) = \frac{n!}{(n - k)! k!}$.
+* `replace_combinations_count(n, k)`: counts combinations with replace using a formula $\bar{C}(n, k) = C(n + k -1, k)$.
 
 Code examples:
 ```Ruby
@@ -379,6 +379,59 @@ replace_combinations_count(3, 5)  # 21
 replace_combinations_count(5, 6)  # 210
 
 ```
+
+#### Combinatorial enumerators
+
+The module realizes a batch of classes of enumerators generating combinatorial objects:
+* `Permutations`
+* `Placements`
+* `ReplacePlacements`
+* `Combinations`
+* `ReplaceCombinations`
+* `CartesianProduct`
+* `Powerset`
+
+Each of the enumerators generates objects of the type according to which it is named.
+
+1) Initialization
+
+The first initializer argument for the calsses `Permutations`, `Placements`, `Combimations`, `ReplacePlacements`, `ReplaceCombinations`, `Powerset` is the source iterable *src*.
+If it is `Integer` an array [1, 2 ... *src*] will be used as source iterable.
+
+The arguments for `CartesinProduct` initializer can be of the type `Array` or `String`.
+
+Below the examples of enumerators creation are presented
+
+```Ruby 
+Permutations.new [1, 2, 3]
+Permutations.new [1, 2, 2, 3]    # repetitions are fine for Permutations
+Permutations.new 'abc'
+Permutations.new 6
+
+Placements.new [1, 2, 3], 2
+# Placements.new [1, 2, 2, 3], 2    # repetitions in the source iterable for Placements raise an error 
+Placements.new 'abc', 2
+Placements.new 6, 3
+ReplacePlacements.new [1, 2, 3], 2
+
+Combinations.new [1, 2, 3, 4], 2
+# Combinations.new [1, 2, 2, 4], 2    # repetitions in the source iterable for Combinations raise an error 
+Combinations.new 'abcde', 3
+Combinations.new 6, 3
+ReplaceCombinations.new 6, 3
+
+CartesianProduct.new [1], [1, 2], 'abc'
+
+Powerset.new [1, 3, 5]
+Powerset.new 'abc'
+Powerset.new 7
+
+```
+
+2) Other class members
+
+All the enumerators share the same funtionality and implement the same public methods.
+
 
 ## Contributing
 
