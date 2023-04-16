@@ -198,7 +198,7 @@ To set new bet call set_bet method:
 casino.set_bet(bet_value)
 ```
 
-Default view of machine:
+Default view of machine: <br />
 7   $   7 <br />
 $   7   $ <br />
 7   7   $ <br />
