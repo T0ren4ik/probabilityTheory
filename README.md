@@ -596,16 +596,16 @@ obj.to_a
 
 #### Higher order enumerators
 
-Each of the combinatorial enumerators has the methods returning higher order iterators.
+Each of the combinatorial enumerators has the methods returning higher order enumerators.
 Those methods are listed below:
 
-* `.map &block`: passes generated items to a block and returns the resulting values
+* `.map &block`: passes generated items to a block and yield the resulting values
 * `.filter &block`: items, which being passed to a block result in `false`, are ignored
 * `.take_while &block`: takes the items from the beginning while they yield `true` from a block
 * `.drop_while &block`: skips the items from the beginning while they yield `true` from a block
 
-Higher order enimerators implement all the same methods as combinatorial enumerators
-(.to_a, .count, etc)  
+Higher order enumerators implement all the same methods as combinatorial enumerators
+(`.to_a`, `.count`, etc)  
 Some examples:
 
 ```Ruby 
@@ -637,7 +637,7 @@ drop_while.take
 ```
 
 Higher order enumerators also have `.map`, `.filter`, `.take_while`, `.dropwhile` methods.
-Due to this higher order iterators can be chained.  
+Due to this higher order enumerators can be chained.  
 Some examples:
 
 ```Ruby 
