@@ -407,6 +407,7 @@ Here a set of functions counting combinatorial entities is presented
 * `replace_combinations_count(n, k)`: counts combinations with replace using a formula $\bar{C}(n, k) = C(n + k -1, k)$.
 
 Code examples:
+
 ```Ruby
 permutations_count(1)  # 1
 permutations_count(6)  # 720
@@ -437,9 +438,9 @@ The module realizes a batch of classes of enumerators generating combinatorial o
 * `CartesianProduct`
 * `Powerset`
 
-Each of the enumerators generates objects according to its named.
+Each of the enumerators generates objects according to its name.
 
-1) Initialization
+1) Enumerators initialization
 
 The first initializer argument for the enumerators `Permutations`, `Placements`, `Combinations`, `ReplacePlacements`, `ReplaceCombinations`, `Powerset` is the source iterable *src*.
 If the first argument is of type `Integer`, an array [1, 2 ... *src*] will be used as the source iterable.
@@ -506,7 +507,7 @@ Powerset.new(2).to_a
 
 ```
 
-* `.take(n=1)`: returns an array of the first *n* objects (by default *n* is equal to 1)   
+* `.take(n=1)`: returns an array of the first *n* items (by default *n* is equal to 1)   
 Some examples:
 
 ```Ruby
@@ -529,8 +530,8 @@ Permutations.new([2, 1]).take 6
 
 ```
 
-* `.count [&block]`: If provided with a block-predicate, returns number of objects which were mapped to true by the predicate.
-If not block is given, returns the number of objects.  
+* `.count [&block]`: If provided with a block-predicate, returns number of items which were mapped to `true` by the predicate.
+If not block is given, returns the overall number of items.  
 Some examples:
 
 ```Ruby
@@ -542,8 +543,9 @@ Combinations.new((1..6).to_a, 3).count {|item| item[0] == 1}
 
 ```
 
-* `.next`: generates the next object  
+* `.next`: generates the next item  
 Example:
+
 ```Ruby
 obj = ReplaceCombinations.new 'aeiou', 3
 
@@ -552,12 +554,13 @@ obj.next
 
 obj.next
 # ['a', 'a', 'e']
-# note: the second time we get another answer!
+# note: the second time we get another item!
 
 ```
 
 * `.restart`: returns an enumerator to the initial state  
 Some examples:
+
 ```Ruby
 obj = CartesianProduct.new([1, 2], ['a', 'b'])
 
@@ -568,7 +571,7 @@ obj.restart
 
 obj.next
 # [1, 'a']
-# note: the second time we got the same answer
+# note: the second time we get the same item
 
 obj.count
 # 4
@@ -593,6 +596,65 @@ obj.to_a
 
 #### Higher order enumerators
 
+Each of the combinatorial enumerators has the methods returning higher order iterators.
+Those methods are listed below:
+
+* `.map &block`: passes generated items to a block and returns the resulting values
+* `.filter &block`: items, which being passed to a block result in `false`, are ignored
+* `.take_while &block`: takes the items from the beginning while they yield `true` from a block
+* `.drop_while &block`: skips the items from the beginning while they yield `true` from a block
+
+Higher order enimerators implement all the same methods as combinatorial enumerators
+(.to_a, .count, etc)  
+Some examples:
+
+```Ruby 
+
+map = Permutations.new(3).map{|item| 100 * item[0] + 10 * item[1] + item[2]}
+# #<EnumTools::Map:...
+
+map.to_a
+# [123, 132, 213, 231, 312, 321]
+
+filter = Permutations.new(3).filter{|item| item[2] == 2}
+# #<EnumTools::Filter...
+
+filter.to_a
+# [[1, 3, 2], [3, 1, 2]]
+
+take_while = Permutations.new(3).take_while{|item| item[0] == 1}
+# #<EnumTools::TakeWhile
+
+take_while.count
+# 2
+
+drop_while = Permutations.new(3).drop_while{|item| item[0] == 1}
+# #<EnumTools::DropWhile
+
+drop_while.take
+# [[2, 1, 3]]
+
+```
+
+Higher order enumerators also have `.map`, `.filter`, `.take_while`, `.dropwhile` methods.
+Due to this higher order iterators can be chained.  
+Some examples:
+
+```Ruby 
+
+enums_chain = ReplacePlacements.new(3, 3).drop_while{|item| item[0] == 1}.take_while{|item| item[1] == 1}
+# #<EnumTools::TakeWhile
+
+enums_chain.to_a
+# [[2, 1, 1], [2, 1, 2], [2, 1, 3]]
+
+enums_chain = Combinations.new(6, 4).filter{|item| item[0] == 2}.map{|item| item.sum}
+# #<EnumTools::Map
+
+enums_chain.to_a
+# [14, 15, 16, 17]
+
+```
 
 
 ## Contributing

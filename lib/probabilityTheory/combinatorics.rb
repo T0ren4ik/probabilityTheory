@@ -1,4 +1,4 @@
-require_relative './BaseEnumerators.rb'
+require_relative './Enumerators.rb'
 
 # Module Scheme
 
