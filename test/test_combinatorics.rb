@@ -85,6 +85,21 @@ class TestCombinatorics < Test::Unit::TestCase
 
   end
 
+  def test_diffrenet_constructor_argimnet_types
+    obj = Permutations.new [1, 2]
+    assert_equal([[1, 2],
+                  [2, 1]], obj.to_a)
+
+    obj = Permutations.new 'ab'
+    assert_equal([['a', 'b'],
+                  ['b', 'a']], obj.to_a)
+    
+    obj = Permutations.new 2
+    assert_equal([[1, 2],
+                  [2, 1]], obj.to_a)
+
+  end
+
   def test_perms_take
     obj = Permutations.new '123'
     assert_equal([['1', '2', '3'],

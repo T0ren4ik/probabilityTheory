@@ -58,8 +58,9 @@ module Combinatorics
 
     def initialize src
       super src
-      # the strange assignment needed to handle permutations with replace
-      @start_index = (0...src.size).map {|i| @src.index(@src[i])}
+      # the strange assignment and sort! needed to handle permutations with replace
+      @src.sort! if @src.uniq != @src
+      @start_index = (0...@src.size).map {|i| @src.index(@src[i])}
       @curr_index = @start_index.dup
     end
 
@@ -98,10 +99,10 @@ module Combinatorics
 
     def initialize src, k
       BaseEnumerator.instance_method(:initialize).bind(self).call(src)
-      raise NotImplementedError, "Currently class Placements does not support repetitions in the source iterable" if @src.uniq.size < @src.size
+      # raise NotImplementedError, "Currently class Placements does not support repetitions in the source iterable" if @src.uniq.size < @src.size
       raise ArgumentError, "Cannot built placements per #{k} from #{@src.size}" if k < 0 || k > @src.size
       @k = k
-      @start_index = (0...src.size).map {|i| i >= @k ? @k : i}
+      @start_index = (0...@src.size).map {|i| i >= @k ? @k : i}
       @curr_index = @start_index.dup
     end
 
@@ -121,7 +122,7 @@ module Combinatorics
     def initialize src, k
       BaseEnumerator.instance_method(:initialize).bind(self).call(src)
       raise ArgumentError, "Cannot built replace placements per #{k} from #{@src.size}" if k < 0
-      @src.uniq!
+      # @src.uniq!
       @k, @n = k, @src.size
       @start_index = Array.new @k, 0
       @max_index = Array.new @k, @n - 1
@@ -150,10 +151,10 @@ module Combinatorics
 
     def initialize src, k
       BaseEnumerator.instance_method(:initialize).bind(self).call(src)
-      raise NotImplementedError, "Currently class Combinations does not support repetitions in the source iterable" if @src.uniq.size < @src.size
+      # raise NotImplementedError, "Currently class Combinations does not support repetitions in the source iterable" if @src.uniq.size < @src.size
       raise ArgumentError, "Cannot built combinations per #{k} from #{@src.size}" if k < 0 || k > @src.size
       @k = k
-      @start_index = (0...src.size).map {|i| i >= @k ? 1 : 0}
+      @start_index = (0...@src.size).map {|i| i >= @k ? 1 : 0}
       @curr_index = @start_index.dup
     end
 
@@ -171,7 +172,7 @@ module Combinatorics
       BaseEnumerator.instance_method(:initialize).bind(self).call(src)
       raise ArgumentError, "Cannot built replace combinations per #{k} from #{@src.size}" if k < 0
       @k = k
-      @src.uniq!
+      # @src.uniq!
       @start_index = (0...(@src.size + @k  - 1)).map {|i| i >= @k ? 1 : 0}
       @curr_index = @start_index.dup
     end
@@ -210,7 +211,8 @@ module Combinatorics
         if !(source_arrays[i].is_a? Array)
           raise ArgumentError, "CartesianProduct argument should be a string or an Array, but #{source_arrays[i]} was received"
         end
-        source_arrays[i].uniq!
+        source_arrays[i] = source_arrays[i].dup
+        # source_arrays[i].uniq!
         @max_index << source_arrays[i].size - 1
       }
       @src = source_arrays

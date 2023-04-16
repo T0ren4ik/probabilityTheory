@@ -9,7 +9,6 @@ module BaseEnumerator
       elsif src.is_a? Array
         @src = src.dup
       end
-      @src.sort!
       @curr_index = @start_index = nil
       @end_not_reached = self.set_end_not_reached
     end

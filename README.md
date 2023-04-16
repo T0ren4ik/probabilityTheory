@@ -441,27 +441,27 @@ Each of the enumerators generates objects of the type according to which it is n
 
 1) Initialization
 
-The first initializer argument for the calsses `Permutations`, `Placements`, `Combimations`, `ReplacePlacements`, `ReplaceCombinations`, `Powerset` is the source iterable *src*.
-If it is `Integer` an array [1, 2 ... *src*] will be used as source iterable.
+The first initializer argument for the calsses `Permutations`, `Placements`, `Combinations`, `ReplacePlacements`, `ReplaceCombinations`, `Powerset` is the source iterable *src*.
+If the first argument is of type `Integer`, an array [1, 2 ... *src*] will be used as the source iterable.
 
-The arguments for `CartesinProduct` initializer can be of the type `Array` or `String`.
+The arguments for `CartesianProduct` initializer can be of type `Array` or `String`.
 
 Below the examples of enumerators creation are presented
 
 ```Ruby 
 Permutations.new [1, 2, 3]
-Permutations.new [1, 2, 2, 3]    # repetitions are fine for Permutations
+Permutations.new [1, 2, 2, 3]    # repetitions are fine
 Permutations.new 'abc'
 Permutations.new 6
 
 Placements.new [1, 2, 3], 2
-# Placements.new [1, 2, 2, 3], 2    # repetitions in the source iterable for Placements raise an error 
+Placements.new [1, 2, 2, 3], 2    # repetitions are fine
 Placements.new 'abc', 2
 Placements.new 6, 3
 ReplacePlacements.new [1, 2, 3], 2
 
 Combinations.new [1, 2, 3, 4], 2
-# Combinations.new [1, 2, 2, 4], 2    # repetitions in the source iterable for Combinations raise an error 
+Combinations.new [1, 2, 2, 4], 2    # repetitions are fine
 Combinations.new 'abcde', 3
 Combinations.new 6, 3
 ReplaceCombinations.new 6, 3
@@ -469,15 +469,127 @@ ReplaceCombinations.new 6, 3
 CartesianProduct.new [1], [1, 2], 'abc'
 
 Powerset.new [1, 3, 5]
+# Powerset.new [1, 3, 5, 5]    # repetitions cause an error
 Powerset.new 'abc'
 Powerset.new 7
 
 ```
 
-2) Other class members
+2) Enumerators methods
 
 All the enumerators share the same funtionality and implement the same public methods.
 
+* `.to_a`: converts enumerator to array
+Some examples:
+
+```Ruby 
+
+Permutations.new(3).to_a
+# [[1, 2, 3],
+#  [1, 3, 2],
+#  [2, 1, 3], 
+#  [2, 3, 1],
+#  [3, 1, 2],
+#  [3, 2, 1]]
+
+CartesianProduct.new([1, 2], 'ab').to_a
+# [[1, 'a'],
+#  [1, 'b'],
+#  [2, 'a'], 
+#  [2, 'b']]
+
+Powerset.new(2).to_a
+# [[],
+#  [1],
+#  [2],   
+#  [2, 1]]
+
+```
+
+* `.take(n=1)`: take *n* elements form the beggining (by default *n* is equal to 1)
+Some examples:
+
+```Ruby
+Powerset.new(10).take
+# [[]]
+
+Placements.new([1, 2, 3], 2).take 4
+# [[1, 2],
+#  [1, 3],
+#  [2, 1], 
+#  [3, 1],
+
+Permutations.new([2, 1]).take 6
+# [[2, 1],
+#  [1, 2],
+#  nil, 
+#  nil,
+#  nil, 
+#  nil]
+
+```
+
+* `.count [&block]`: If provided with a block-predicate, returns number ob objects which maps to true by the predicate.
+If not block is given, returns the number of objects. 
+Some examples:
+
+```Ruby
+ReplacePlacements.new(3, 3).count
+# 27
+
+Combinations.new((1..6).to_a, 3).count {|item| item[0] == 1}
+# 10
+
+```
+
+* `.next`: generates the next object
+Example:
+```Ruby
+obj = ReplaceCombinations.new 'aeiou', 3
+
+obj.next
+# ['a', 'a', 'a']
+
+obj.next
+# ['a', 'a', 'e']
+# note: the second time we get another answer!
+
+```
+
+* `.restart`: returns an enumerator to the initial state
+Some examples:
+```Ruby
+obj = CartesianProduct.new([1, 2], ['a', 'b'])
+
+obj.next
+# [1, 'a']
+
+obj.restart
+
+obj.next
+# [1, 'a']
+# note: the second time we got the same answer
+
+obj.count
+# 4
+
+obj.next
+# nil, cause after .count call enumerator is in the final state
+
+obj.restart
+obj.next
+# [1, 'a']
+
+# you don't need to restart to use .to_a, .take and .count
+obj.count
+# 4
+obj.to_a
+# [[1, 'a']
+#  [1, 'b']
+#  [2, 'a']
+#  [2, 'b']]
+
+```
 
 ## Contributing
 
