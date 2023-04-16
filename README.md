@@ -437,16 +437,16 @@ The module realizes a batch of classes of enumerators generating combinatorial o
 * `CartesianProduct`
 * `Powerset`
 
-Each of the enumerators generates objects of the type according to which it is named.
+Each of the enumerators generates objects according to its named.
 
 1) Initialization
 
-The first initializer argument for the calsses `Permutations`, `Placements`, `Combinations`, `ReplacePlacements`, `ReplaceCombinations`, `Powerset` is the source iterable *src*.
+The first initializer argument for the enumerators `Permutations`, `Placements`, `Combinations`, `ReplacePlacements`, `ReplaceCombinations`, `Powerset` is the source iterable *src*.
 If the first argument is of type `Integer`, an array [1, 2 ... *src*] will be used as the source iterable.
 
 The arguments for `CartesianProduct` initializer can be of type `Array` or `String`.
 
-Below the examples of enumerators creation are presented
+Here some examples of enumerators creation are presented
 
 ```Ruby 
 Permutations.new [1, 2, 3]
@@ -479,8 +479,8 @@ Powerset.new 7
 
 All the enumerators share the same funtionality and implement the same public methods.
 
-* `.to_a`: converts enumerator to array
-Some examples:
+* `.to_a`: converts enumerator to array  
+Some examples:  
 
 ```Ruby 
 
@@ -506,7 +506,7 @@ Powerset.new(2).to_a
 
 ```
 
-* `.take(n=1)`: take *n* elements form the beggining (by default *n* is equal to 1)
+* `.take(n=1)`: returns an array of the first *n* objects (by default *n* is equal to 1)   
 Some examples:
 
 ```Ruby
@@ -529,8 +529,8 @@ Permutations.new([2, 1]).take 6
 
 ```
 
-* `.count [&block]`: If provided with a block-predicate, returns number ob objects which maps to true by the predicate.
-If not block is given, returns the number of objects. 
+* `.count [&block]`: If provided with a block-predicate, returns number of objects which were mapped to true by the predicate.
+If not block is given, returns the number of objects.  
 Some examples:
 
 ```Ruby
@@ -542,7 +542,7 @@ Combinations.new((1..6).to_a, 3).count {|item| item[0] == 1}
 
 ```
 
-* `.next`: generates the next object
+* `.next`: generates the next object  
 Example:
 ```Ruby
 obj = ReplaceCombinations.new 'aeiou', 3
@@ -556,7 +556,7 @@ obj.next
 
 ```
 
-* `.restart`: returns an enumerator to the initial state
+* `.restart`: returns an enumerator to the initial state  
 Some examples:
 ```Ruby
 obj = CartesianProduct.new([1, 2], ['a', 'b'])
@@ -574,7 +574,7 @@ obj.count
 # 4
 
 obj.next
-# nil, cause after .count call enumerator is in the final state
+# nil cause after .count call enumerator is in the final state
 
 obj.restart
 obj.next
@@ -590,6 +590,10 @@ obj.to_a
 #  [2, 'b']]
 
 ```
+
+#### Higher order enumerators
+
+
 
 ## Contributing
 
