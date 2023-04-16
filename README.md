@@ -1,6 +1,6 @@
 # ProbabilityTheory
 
-Гем "ProbabilityTheory" - это библиотека на Ruby, которая содержит функции и модули для работы с комбинаторикой, различными игровыми механиками и математическими формулами.
+The "Probability Theory" gem is a Ruby library that contains functions and modules for working with combinatorics, various game mechanics and mathematical formulas.
 
 ## Installation
 
