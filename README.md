@@ -199,9 +199,9 @@ casino.set_bet(bet_value)
 ```
 
 Default view of machine:
-7   $   7
-$   7   $
-7   7   $
+7   $   7 <br />
+$   7   $ <br />
+7   7   $ <br />
 
 
 ### Usage Guide for Dice Class
