@@ -15,13 +15,13 @@ To install the "ProbabilityTheory" gem from the Git repository, follow these ste
 4) Create a Gemfile in the root directory of the project.
 
 5) Open Gemfile in a text editor and add the following line:
-``` gem 'Probability Theory', git: 'https://github.com/T0ren4ik/probabilityTheory' ```
+``` gem 'probabilityTheory', git: 'https://github.com/T0ren4ik/probabilityTheory' ```
 
-6) Save the changes to the Gemfile.
+6) Enter the bundle install command to install the "Probability Theory" gem and its dependencies from the Git repository.
 
-7) Enter the bundle install command to install the "Probability Theory" gem and its dependencies from the Git repository.
+7) Note that because RubyGems lacks the ability to handle gems from git, any gems installed from a git repository will not show up in gem list. They will, however, be available after running Bundler.setup
 
-Ready! Now you can use the "ProbabilityTheory" gem in your project.
+Ready! Now you can use the "ProbabilityTheory" gem in your project. Write require 'ProbabilityTheory'.
 
 ## Usage
 
