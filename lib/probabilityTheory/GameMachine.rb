@@ -171,11 +171,11 @@ def gaming(cash_start, symbols, probability_symbols, rate_bet)
   end
 end
 
-srand 1114 # 1 diagonal line
+# srand 1114 # 1 diagonal line
 
-cash_start = 3000
-symbols = ['^', '*', '#', '$', '7']
-probability_symbols = [0.11, 0.14, 0.2, 0.05, 0.5]
-rate_bet = 1.25
+# cash_start = 3000
+# symbols = ['^', '*', '#', '$', '7']
+# probability_symbols = [0.11, 0.14, 0.2, 0.05, 0.5]
+# rate_bet = 1.25
 
-p = gaming(cash_start, symbols, probability_symbols, rate_bet)
+# p = gaming(cash_start, symbols, probability_symbols, rate_bet)
